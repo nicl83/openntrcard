@@ -1,3 +1,7 @@
+/* [General] */
+// Create slats between contacts (requires hi-res printer!)
+contact_slats = false;
+
 /* [Alignment Peg Dimensions] */
 
 // Alignment peg diameter
@@ -15,44 +19,57 @@ mid_peg_vert_offset = 13.8;
 // Horizontal offset of middle pegs
 mid_peg_horiz_offset = 3;
 
+/* [Thickness Adjustment] */
+
+// Front-half depth (label-side)
+label_depth = 0.8;
+
+// How much should the PCB be raised from the bottom of the well?
+pcb_standoff_height = 2.3;
+
 /* [Standoff Dimensions] */
 // Vertical offset for board standoffs
 standoff_vert_offset = 20.5;
 
 // Board standoff size
-standoff = [2.5,2.9,2.3];
-
+standoff = [2.5,2.9,pcb_standoff_height];
 
 /* [Hidden] */
 $fn = 10;
 
+// Cartridge depth (including front-half)
+card_depth = 3.6;
+
 // Size of well for PCB
 ds_card_center = [30.3,32.6,3];
 
+// Depth of plastic behind PCB
+behind_pcb_depth = card_depth - label_depth - ds_card_center[2];
+
 // assume a cuboid DS card in a vacuum...
 // Overall dimensions of the cards, used for other calculations
-ds_card_cube = [32.75,34.85,3.6];
+ds_card_cube = [32.75,34.85,card_depth];
 card_center_offset = [
     (ds_card_cube[0] - ds_card_center[0])/2,
     (ds_card_cube[1] - ds_card_center[1])/2,
     1 // sorry for magic...
 ];
 
-// Game Card contact dimensions
-ds_card_pins = 17; // number of contacts
-pin_width = 1.5; // width of an individual contact
-pin_spacing = 26.6/ds_card_pins;
-
 // Polygon defining the side profile of a DS cartridge
 ds_card_side_profile = [
     [0,0],
     [32,0],
-    [34.85,2.8],
-    [34.85,3.6],
-    [32,3.6],
-    [32,2.8],
-    [0,2.8]
+    [34.85,card_depth - label_depth],
+    [34.85,card_depth],
+    [32,card_depth],
+    [32,card_depth - label_depth],
+    [0,card_depth - label_depth]
 ];
+
+// Game Card contact dimensions
+ds_card_pins = 17; // number of contacts
+pin_width = 1.5; // width of an individual contact
+pin_spacing = 26.6/ds_card_pins;
 
 // Module using the side-profile polygon
 // to create a solid DS Card (with lip for top half)
@@ -67,12 +84,21 @@ module ds_card_primitive() {
 // NOTE: does not print correctly on Ender 3 at highest res
 // not a priority as this plastic is not required
 module ds_card_pins_module() {
+    translate([0,0,behind_pcb_depth])
     difference() {
         cube([29.8,12.1,1.3]);
         translate([1.6,0,0])
-        for (i = [0 : ds_card_pins-1]) {
-            translate([i*pin_spacing,0,0])
-            cube([1.5,10.5,1.3]);
+        if (contact_slats) {
+            for (i = [0 : ds_card_pins-1]) {
+                translate([i*pin_spacing,0,0])
+                cube([1.5,10.5,1.3]);
+            }
+        } else {
+            cube([
+                ds_card_pins*pin_spacing,
+                10.5,
+                pcb_standoff_height
+            ]);
         }
     }
 }
@@ -90,6 +116,9 @@ module ds_card_assembly() {
         ds_card_primitive();
         translate(card_center_offset)
             cube(ds_card_center);
+
+        // Cutout for cartridge pins
+        // TODO make less magic-numbery
         translate([3.5,0,0])
             cube([26.6,10.5,2.4]);
         
