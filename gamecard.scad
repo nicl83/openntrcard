@@ -2,6 +2,9 @@
 // Create slats between contacts (requires hi-res printer!)
 contact_slats = false;
 
+// Punch hole through center (faster printing)
+fast_print = false;
+
 /* [Alignment Peg Dimensions] */
 
 // Alignment peg diameter
@@ -17,7 +20,7 @@ top_peg_horiz_offset = 8.1;
 mid_peg_vert_offset = 13.8;
 
 // Horizontal offset of middle pegs
-mid_peg_horiz_offset = 3;
+mid_peg_horiz_offset = 2.7;
 
 /* [Thickness Adjustment] */
 
@@ -36,7 +39,7 @@ standoff_vert_offset = 20.5;
 $fn = 20;
 
 // Cartridge depth (including front-half)
-card_depth = 3.6;
+card_depth = 3.5;
 
 // Polygon defining the side profile of a DS cartridge
 ds_card_side_profile = [
@@ -63,15 +66,18 @@ card_center_offset = [
     1 // sorry for magic...
 ];
 
+// Tolerance for label side
+ds_label_tolerance = 0.1;
+
 // Polygon defining the front half (label side)
 ds_label_outline = [
-    [0,0],
-    [ds_card_cube[0],0],
+    [0,card_center_offset[0]],
+    [ds_card_cube[0],card_center_offset[0]],
     [ds_card_cube[0],ds_card_side_profile[1][0]],
-    [ds_card_cube[0]-card_center_offset[0],ds_card_side_profile[1][0]],
-    [ds_card_cube[0]-card_center_offset[0],ds_card_side_profile[2][0] - card_center_offset[1]],
-    [card_center_offset[0],ds_card_side_profile[2][0] - card_center_offset[1]],
-    [card_center_offset[0],ds_card_side_profile[1][0]],
+    [ds_card_cube[0]-card_center_offset[0]-ds_label_tolerance,ds_card_side_profile[1][0]],
+    [ds_card_cube[0]-card_center_offset[0]-ds_label_tolerance,ds_card_side_profile[2][0] - card_center_offset[1]],
+    [card_center_offset[0]+ds_label_tolerance,ds_card_side_profile[2][0] - card_center_offset[1]],
+    [card_center_offset[0]+ds_label_tolerance,ds_card_side_profile[1][0]],
     [0,ds_card_side_profile[1][0]]
 ];
 
@@ -166,9 +172,26 @@ module ds_card_assembly() {
                 3.9,
                 2
             ]);
-        
+
+        // rapid prototype hole (fast print)
+        if(fast_print) {
+            translate([ds_card_cube[0]/2,ds_card_cube[1]/2,0])
+            cube([
+                ds_card_cube[0]-(mid_peg_horiz_offset*2)-(peg_dia*2),
+                ds_card_cube[1] / 2,
+                ds_card_cube[2]*2
+            ],center=true);
+            translate([ds_card_cube[0]/2,ds_card_cube[1]/2,0])
+            cube([
+                ds_card_cube[0]-(top_peg_horiz_offset*2)-(peg_dia*2),
+                ds_card_cube[1] - card_center_offset[1] - 2, // sorry
+                ds_card_cube[2]*2
+            ],center=true);
+        }
     }
     // support for side cuts
+    translate([0,0,pcb_standoff_height+behind_pcb_depth-0.5]) 
+        cube([2,16.2,0.5]);
     translate([2,12.3,behind_pcb_depth])
         cube([1,3.9,ds_card_cube[2]]);
     
@@ -232,4 +255,13 @@ rotate(180)
 difference() {
     linear_extrude(label_depth)
     polygon(ds_label_outline);
+
+    if(fast_print) {
+        translate([ds_card_cube[0]/2,ds_card_cube[1]/2,0])
+        cube([
+            ds_card_cube[0]-8,
+            ds_card_cube[1]/2,
+            ds_card_cube[2]*2
+        ],center=true);
+    }
 }
