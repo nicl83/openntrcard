@@ -10,7 +10,7 @@ The main SCAD file - `gamecard.scad` - is a direct replica of the OEM Game Card 
 For my prototypes, I am using standard Scotch/cellophane tape to hold the two halves together.
 
 On my R4 card (original `(NDS/NDSL)` R4) there is a single screw through the center of the card to hold it together.
-If this model is to be adapted for flash-card use, a similar modification is recommended
+If this model is to be adapted for flash-card use, a similar modification is recommended.
 
 ## Why?
 All modern flash-cards for the Nintendo DS are (if memory serves me correctly) based on the Acekard 2i design. 
