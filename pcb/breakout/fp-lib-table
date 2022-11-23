@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name "NTRCardContacts")(type "KiCad")(uri "C:/Users/nicho/projects/openntrcard/pcb/NTRCardContacts.pretty")(options "")(descr ""))
+)
