@@ -1,7 +1,17 @@
 # openntrcard
 WIP reverse-engineering project for the Nintendo DS Game Card
+![OpenNTRCard](pics/openntrcard.png)
+
 ## What is this?
 As it currently stands, an OpenSCAD file describing the Nintendo DS "Game Card" housing - both front (label) and back (PCB) halves.
+
+The main SCAD file - `gamecard.scad` - is a direct replica of the OEM Game Card housing.
+**It does NOT include a way to join the two halves**. On retail games, the two halves are welded/glued/etc at the factory.
+For my prototypes, I am using standard Scotch/cellophane tape to hold the two halves together.
+
+On my R4 card (original `(NDS/NDSL)` R4) there is a single screw through the center of the card to hold it together.
+If this model is to be adapted for flash-card use, a similar modification is recommended
+
 ## Why?
 All modern flash-cards for the Nintendo DS are (if memory serves me correctly) based on the Acekard 2i design. 
 This is a closed-source design, running proprietary software, made by anoymous sources in and around China.
