@@ -31,6 +31,9 @@ label_depth = 0.8;
 pcb_depth = 0.8;
 // TODO: measure this
 
+// Depth of plastic behind PCB
+behind_pcb_depth = 0.5;
+
 /* [Standoff Dimensions] */
 // Vertical offset for board standoffs
 standoff_vert_offset = 20.5;
@@ -53,17 +56,16 @@ ds_card_side_profile = [
 ];
 
 // Size of well for PCB
-ds_card_center = [30.3,32.6,3];
+ds_card_center = [30.3,32.6,card_depth - behind_pcb_depth];
 
 // assume a cuboid DS card in a vacuum...
 // Overall dimensions of the cards, used for other calculations
 ds_card_cube = [32.75,34.85,card_depth];
 
-
 card_center_offset = [
     (ds_card_cube[0] - ds_card_center[0])/2,
     (ds_card_cube[1] - ds_card_center[1])/2,
-    1 // sorry for magic...
+    behind_pcb_depth
 ];
 
 // Tolerance for label side
@@ -80,9 +82,6 @@ ds_label_outline = [
     [card_center_offset[0]+ds_label_tolerance,ds_card_side_profile[1][0]],
     [0,ds_card_side_profile[1][0]]
 ];
-
-// Depth of plastic behind PCB
-behind_pcb_depth = card_center_offset[2];
 
 // Standoff height
 pcb_standoff_height =
